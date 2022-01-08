@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://netgrif.github.io/petriflow/petriflow.schema.xsd">
+	<id>kava</id>
+	<initials>KAV</initials>
+	<title>Kava</title>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="text">
+		<id>krajina_povodu</id>
+		<title>Krajina povodu</title>
+	</data>
+	<data type="number">
+		<id>cena</id>
+		<title>Cena</title>
+	</data>
+	<data type="text">
+		<id>odroda</id>
+		<title>Odroda</title>
+		<desc>Arabica, Robusta...</desc>
+	</data>
+	<data type="number">
+		<id>vaha</id>
+		<title>Vaha</title>
+		<desc>250g, 500g...</desc>
+	</data>
+	<data type="taskRef">
+		<id>taskRef_0</id>
+		<title></title>
+		<init>t_input_form</init>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t_delete</id>
+		<x>660</x>
+		<y>380</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Delete</label>
+		<assignPolicy>auto</assignPolicy>
+		<event type="finish">
+			<id>t_delete_finish</id>
+			<actions phase="post">
+				<action>					async.run{
+						workflowService.deleteCase(useCase.stringId);
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_create</id>
+		<x>420</x>
+		<y>380</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Create</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+		<event type="cancel">
+			<id>t_create_finish</id>
+			<actions phase="post">
+				<action>		
+					async.run{
+						workflowService.deleteCase(useCase.stringId);
+					}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>t_create_finish</id>
+			<actions phase="post">
+				<action>		
+					krajina_povodu: f.krajina_povodu,
+					vaha: f.vaha,
+					odroda: f.odroda;
+
+					changeCaseProperty "title" about {
+						def krajinaD = (krajina_povodu.value != null) ? krajina_povodu.value : "Krajina povodu"
+						def odrodaD = (odroda.value != null) ? odroda.value : "Odroda"
+						def vahaD = (vaha.value != null) ? vaha.value : "Vaha"
+						"${krajinaD} - ${odrodaD}, ${vahaD}g"
+					}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t_read</id>
+		<x>540</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Read</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>visible</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_update</id>
+		<x>540</x>
+		<y>500</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Update</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>taskRef_0</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<transition>
+		<id>t_input_form</id>
+		<x>300</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Input_form</label>
+		<assignPolicy>auto</assignPolicy>
+		<dataGroup>
+			<id>DataGroup</id>
+			<layout>grid</layout>
+			<dataRef>
+				<id>krajina_povodu</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>cena</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>0</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>odroda</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>vaha</id>
+				<logic>
+					<behavior>editable</behavior>
+					<behavior>required</behavior>
+				</logic>
+				<layout>
+					<x>2</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>2</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+		</dataGroup>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p2</id>
+		<x>540</x>
+		<y>380</y>
+		<label>Created</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p1</id>
+		<x>260</x>
+		<y>380</y>
+		<label>uninitialized</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>p3</id>
+		<x>820</x>
+		<y>380</y>
+		<label>deleted</label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t_create</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>t_create</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_delete</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a5</id>
+		<type>read</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_read</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a6</id>
+		<type>regular</type>
+		<sourceId>p2</sourceId>
+		<destinationId>t_update</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a7</id>
+		<type>regular</type>
+		<sourceId>t_update</sourceId>
+		<destinationId>p2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a8</id>
+		<type>regular</type>
+		<sourceId>t_delete</sourceId>
+		<destinationId>p3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

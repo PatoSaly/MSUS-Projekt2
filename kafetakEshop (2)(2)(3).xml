@@ -23,15 +23,12 @@
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
 	<data type="text">
-		<id>text_4</id>
+		<id>novy_nazov_kavy</id>
 		<title>Názov kávy</title>
 	</data>
 	<data type="enumeration">
 		<id>ponuka_kav</id>
 		<title></title>
-		<values>Brazilia,15.90</values>
-		<values>Etiopia,12.50</values>
-		<values>Kena,13</values>
 	</data>
 	<data type="taskRef">
 		<id>taskRef_0</id>
@@ -44,15 +41,11 @@
 		<values>area</values>
 	</data>
 	<data type="enumeration">
-		<id>enumeration_2</id>
+		<id>kosik_nahlad</id>
 		<title>Váš Kôš</title>
 		<view>
 			<list/>
 		</view>
-	</data>
-	<data type="button">
-		<id>button_0</id>
-		<title>Pridať do košíka</title>
 	</data>
 	<data type="taskRef">
 		<id>taskRef_2</id>
@@ -60,7 +53,7 @@
 		<init>t45</init>
 	</data>
 	<data type="enumeration">
-		<id>enumeration_3</id>
+		<id>sposob_platby</id>
 		<title>Spôsob platby</title>
 		<values>Platba prevodom na účet</values>
 		<values>Platba kreditnou kartou</values>
@@ -69,76 +62,85 @@
 		</view>
 	</data>
 	<data type="number">
-		<id>number_0</id>
+		<id>rozpocet</id>
 		<title>Rozpočet</title>
 	</data>
 	<data type="number">
-		<id>number_1</id>
+		<id>cena_za_kavu</id>
 		<title>Cena na zaplatenie</title>
 	</data>
 	<data type="text">
-		<id>text_3</id>
+		<id>vyjadrenie_o_overeni</id>
 		<title>Vyjadrenie o overení</title>
 		<values>area</values>
 	</data>
 	<data type="boolean">
-		<id>boolean_0</id>
+		<id>tel_cislo_bool</id>
 		<title>Pridať Tel. č.</title>
 		<init>false</init>
 	</data>
 	<data type="text">
-		<id>text_0</id>
+		<id>tel_cislo</id>
 		<title>Telefónne číslo</title>
 	</data>
 	<data type="enumeration">
-		<id>enumeration_0</id>
+		<id>poziadavky_id</id>
 		<title>Požiadavky</title>
 		<view>
 			<list/>
 		</view>
 	</data>
 	<data type="text">
-		<id>text_1</id>
+		<id>cislo_uctu</id>
 		<title>Číslo účtu</title>
 	</data>
 	<data type="number">
-		<id>number_2</id>
+		<id>var_symbol</id>
 		<title>Variabilný symbol</title>
 	</data>
 	<data type="number">
-		<id>number_3</id>
+		<id>konst_symbol</id>
 		<title>Konštantný symbol</title>
 	</data>
 	<data type="number">
-		<id>number_4</id>
+		<id>cislo_kred_karty</id>
 		<title>Číslo kreditnej karty</title>
 	</data>
 	<data type="number">
-		<id>number_5</id>
+		<id>platnost_karty_do</id>
 		<title>Platnosť do</title>
 	</data>
 	<data type="number">
-		<id>number_6</id>
+		<id>bezp_kod</id>
 		<title>Bezpečnostný kód</title>
 	</data>
 	<data type="text">
-		<id>text_2</id>
+		<id>nova_poziadavka</id>
 		<title>Pridať novú požiadavku pre pražiara</title>
 		<values>area</values>
 		<action trigger="set">
-			text_2: f.text_2,
-			enumeration_0: f.enumeration_0;
+			text_2: f.nova_poziadavka,
+			enumeration_0: f.poziadavky_id;
 
 			change enumeration_0 choices { 
 				return enumeration_0.choices + [text_2.value];
-				change text_2 value {""}
+				
 			}
-		</action>
+            change text_2 value {""}
+</action>
 	</data>
 	<data type="taskRef">
 		<id>taskRef_1</id>
 		<title></title>
 		<init>t39</init>
+	</data>
+	<data type="taskRef">
+		<id>coffee_create_taskref</id>
+		<title></title>
+	</data>
+	<data type="text">
+		<id>test</id>
+		<title>Test</title>
 	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
@@ -167,7 +169,7 @@
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>enumeration_2</id>
+				<id>kosik_nahlad</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -250,9 +252,9 @@
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>taskRef_1</id>
+				<id>poziadavky_id</id>
 				<logic>
-					<behavior>visible</behavior>
+					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -285,7 +287,7 @@
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_2</id>
+				<id>nova_poziadavka</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -370,22 +372,38 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>t6_finish</id>
+			<actions phase="pre">
+				<action>
+					ponuka_kav: f.ponuka_kav;
+
+					def cases = findCases( {it.processIdentifier.eq("6183c1a50a975a0f8cb2031c_kava")} );
+
+					for (caze in cases) {
+						change ponuka_kav choices { return ponuka_kav.choices + [(caze.dataSet.get("krajina_povodu").value + " - " + caze.dataSet.get("odroda").value + " " + caze.dataSet.get("vaha").value + "g, " + caze.dataSet.get("cena").value + "€")]}
+						//change ponuka_kav choices { return ponuka_kav.choices + ["kava"]}
+					}
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>t6_finish</id>
 			<actions phase="post">
-				<action>ponuka_kav: f.ponuka_kav,
-kosik: f.enumeration_2;
+				<action>
+					ponuka_kav: f.ponuka_kav,
+					kosik: f.kosik_nahlad;
 
-change kosik choices {
-    return kosik.choices + ponuka_kav.value;
-}
-</action>
+					change kosik choices {
+						return kosik.choices + ponuka_kav.value;
+					}
+				</action>
 			</actions>
 		</event>
 	</transition>
 	<transition>
 		<id>t5</id>
-		<x>140</x>
+		<x>100</x>
 		<y>380</y>
 		<layout>
 			<offset>0</offset>
@@ -440,7 +458,7 @@ change kosik choices {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>enumeration_3</id>
+				<id>sposob_platby</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -455,7 +473,7 @@ change kosik choices {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>number_0</id>
+				<id>rozpocet</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -470,12 +488,12 @@ change kosik choices {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>boolean_0</id>
+				<id>tel_cislo_bool</id>
 				<logic>
 					<behavior>editable</behavior>
 					<action trigger="set">t20: t.t20,
-text_0: f.text_0,
-boolean_0: f.boolean_0;
+text_0: f.tel_cislo,
+boolean_0: f.tel_cislo_bool;
 
 make text_0, editable on t20 when {
      return boolean_0.value == true;
@@ -497,7 +515,7 @@ make text_0, hidden on t20 when {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>text_0</id>
+				<id>tel_cislo</id>
 				<logic>
 					<behavior>hidden</behavior>
 				</logic>
@@ -515,7 +533,7 @@ make text_0, hidden on t20 when {
 		<event type="finish">
 			<id>t20_finish</id>
 			<actions phase="post">
-				<action>sposob_platby: f.enumeration_3;
+				<action>sposob_platby: f.sposob_platby;
 
 if (sposob_platby.value == "Platba prevodom na účet") {
     async.run{
@@ -553,7 +571,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_1</id>
+				<id>cislo_uctu</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -568,7 +586,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>number_2</id>
+				<id>var_symbol</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -583,7 +601,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>number_3</id>
+				<id>konst_symbol</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -627,7 +645,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>number_4</id>
+				<id>cislo_kred_karty</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -642,7 +660,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>number_5</id>
+				<id>platnost_karty_do</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -657,7 +675,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>number_6</id>
+				<id>bezp_kod</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -702,7 +720,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>number_0</id>
+				<id>rozpocet</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -717,7 +735,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 				</layout>
 			</dataRef>
 			<dataRef>
-				<id>number_1</id>
+				<id>cena_za_kavu</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -738,28 +756,29 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 		<event type="finish">
 			<id>t23_finish</id>
 			<actions phase="post">
-				<action>kosik: f.enumeration_2,
-text_3: f.text_3,
-cena: f.number_1,
-rozpocet: f.number_0;
+				<action>
+					kosik: f.kosik_nahlad,
+					text_3: f.vyjadrenie_o_overeni,
+					cena: f.cena_za_kavu,
+					rozpocet: f.rozpocet;
 
-def c = 0.0
-for(def polozka in kosik.choices){
-    polozka = polozka.toString()
-    def tmp = polozka.split(",")
-    c = c +  Double.parseDouble(tmp[1])
-}
+					def c = 0.0
+					for(def polozka in kosik.choices){
+						polozka = polozka.toString()
+						def tmp = polozka.split(",")
+						c = c +  Double.parseDouble(tmp[1])
+					}
 
-if (c &gt; rozpocet.value) {
-    change text_3 value { "Objednávka zamietnutá z dôvodu, že cena je vyššia než Váš rozpočet." }
-    async.run {
-        assignTask("t62")
-        finishTask("t62")
-    }
-} else {
-    change text_3 value { "Objednávka úspešne vytvorená." }
-}
-</action>
+					if (c &gt; rozpocet.value) {
+						change text_3 value { "Objednávka zamietnutá z dôvodu, že cena je vyššia než Váš rozpočet." }
+						async.run {
+							assignTask("t62")
+							finishTask("t62")
+						}
+					} else {
+						change text_3 value { "Objednávka úspešne vytvorená." }
+					}
+				</action>
 			</actions>
 		</event>
 	</transition>
@@ -782,7 +801,7 @@ if (c &gt; rozpocet.value) {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_3</id>
+				<id>vyjadrenie_o_overeni</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
@@ -816,30 +835,122 @@ if (c &gt; rozpocet.value) {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_4</id>
+				<id>coffee_create_taskref</id>
 				<logic>
 					<behavior>editable</behavior>
-					<action trigger="set">ponuka_kav: f.ponuka_kav,
-nazov: f.text_4;
-
-change ponuka_kav choices { 
-    return ponuka_kav.choices + [nazov.value];
-}
-</action>
 				</logic>
 				<layout>
 					<x>0</x>
 					<y>0</y>
 					<rows>1</rows>
-					<cols>4</cols>
+					<cols>1</cols>
+					<offset>0</offset>
+					<template>material</template>
+					<appearance>outline</appearance>
+				</layout>
+			</dataRef>
+			<dataRef>
+				<id>test</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+				<layout>
+					<x>0</x>
+					<y>1</y>
+					<rows>1</rows>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>Add_coffee_assign</id>
+			<actions phase="post">
+				<action>
+					test: f.test,
+					coffee_create_taskref: f.coffee_create_taskref;
+
+					def new_coffee_instance = createCase("6183c1a50a975a0f8cb2031c_kava")
+					if (new_coffee_instance == null) {
+						change test value {"Return v instance"}
+						return
+					}
+
+					def coffee_create_task = findTask({it.caseId.eq(new_coffee_instance.stringId).and(it.transitionId.eq("t_create"))})
+					if(coffee_create_task == null) {
+						change test value {"Return v task"}
+						return
+					}
+
+					assignTask(coffee_create_task)
+
+					change coffee_create_taskref value { [coffee_create_task.stringId]; }
+
+					change test value {"Som na konci"}
+
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>Add_coffee_cancel</id>
+			<actions phase="post">
+				<action>
+				test: f.test,
+				ponuka_kav: f.ponuka_kav,
+				coffee_create_taskref: f.coffee_create_taskref;
+
+				if(coffee_create_taskref.value == null || coffee_create_taskref.value == []) {
+					return
+				}
+
+				def coffee_create_to_cancel = findTask({it._id.eq(coffee_create_taskref.value.first())})
+				if(coffee_create_to_cancel == null) {
+					change coffee_create_taskref value { [] }
+					return
+				}
+
+				cancelTask(coffee_create_to_cancel)
+
+				change coffee_create_taskref value { [] }
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
-			<id>t37_finish</id>
+			<id>Add_coffee_finish</id>
+			<actions phase="post">
+				<action>
+					test: f.test,
+					ponuka_kav: f.ponuka_kav,
+					coffee_create_taskref: f.coffee_create_taskref;
+
+
+					def new_created_coffee_task = findTask({it._id.eq(coffee_create_taskref.value.first())})
+					if(new_created_coffee_task == null) {
+						return
+					}
+
+					def new_coffee_instance = findCase( { it._id.eq(new_created_coffee_task.caseId) } )
+
+					if (new_coffee_instance == null) {
+						return
+					}
+
+					change test value {"chzbqa nefinishnuty"}
+					
+					change ponuka_kav choices { return ponuka_kav.choices + [(new_coffee_instance.dataSet.get("krajina_povodu").value + " - " + new_coffee_instance.dataSet.get("odroda").value + " " + new_coffee_instance.dataSet.get("vaha").value + "g, " + new_coffee_instance.dataSet.get("cena").value + "€" )] }
+					//change ponuka_kav choices { return ponuka_kav.choices + ["kava"]}
+
+					change test value {"Create nefinishnuty"}
+
+					finishTask(new_created_coffee_task)
+
+					change test value {"Create finishnuty"}
+
+					change coffee_create_taskref value { [] }
+				</action>
+			</actions>
 		</event>
 	</transition>
 	<transition>
@@ -877,74 +988,6 @@ change ponuka_kav choices {
 		</dataGroup>
 	</transition>
 	<transition>
-		<id>t39</id>
-		<x>100</x>
-		<y>60</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Požiadavky</label>
-		<roleRef>
-			<id>system</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<dataGroup>
-			<id>DataGroup</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>enumeration_0</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>1</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
-		<id>t45</id>
-		<x>100</x>
-		<y>140</y>
-		<layout>
-			<offset>0</offset>
-		</layout>
-		<label>Košík</label>
-		<roleRef>
-			<id>system</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<dataGroup>
-			<id>DataGroup</id>
-			<layout>grid</layout>
-			<dataRef>
-				<id>enumeration_2</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>0</y>
-					<rows>2</rows>
-					<cols>4</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
-		</dataGroup>
-	</transition>
-	<transition>
 		<id>t62</id>
 		<x>1740</x>
 		<y>340</y>
@@ -968,7 +1011,7 @@ change ponuka_kav choices {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_3</id>
+				<id>vyjadrenie_o_overeni</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -1003,7 +1046,7 @@ change ponuka_kav choices {
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>text_3</id>
+				<id>vyjadrenie_o_overeni</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -1062,7 +1105,7 @@ change ponuka_kav choices {
 	</place>
 	<place>
 		<id>p5</id>
-		<x>60</x>
+		<x>20</x>
 		<y>380</y>
 		<label></label>
 		<tokens>1</tokens>
