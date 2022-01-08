@@ -22,10 +22,6 @@
 	<!-- PROCESS ROLE REFS -->
 	<!-- PROCESS USER REFS -->
 	<!-- DATA -->
-	<data type="text">
-		<id>novy_nazov_kavy</id>
-		<title>Názov kávy</title>
-	</data>
 	<data type="multichoice_map">
 		<id>ponuka_kav</id>
 		<title></title>
@@ -126,10 +122,6 @@
 	<data type="taskRef">
 		<id>poziadavka_create_taskref</id>
 		<title></title>
-	</data>
-	<data type="text">
-		<id>test</id>
-		<title>Test</title>
 	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
@@ -270,6 +262,26 @@
 				</action>
 			</actions>
 		</event>
+		<event type="cancel">
+			<id>zobrazenie_finish</id>
+			<actions phase="post">
+				<action>
+					poziadavky: f.poziadavky_id;
+
+					change poziadavky choices {[]}
+				</action>
+			</actions>
+		</event>
+		<event type="finish">
+			<id>zobrazenie_finish</id>
+			<actions phase="post">
+				<action>
+					poziadavky: f.poziadavky_id;
+
+					change poziadavky choices {[]}
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>t27</id>
@@ -324,7 +336,7 @@
 					}
 
 					assignTask(poziadavka_create_task)
-					
+
 					change poziadavka_create_taskref value { [poziadavka_create_task.stringId]; }
 
 				</action>
@@ -940,13 +952,11 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 
 					def new_coffee_instance = createCase("6183c1a50a975a0f8cb2031c_kava")
 					if (new_coffee_instance == null) {
-						change test value {"Return v instance"}
 						return
 					}
 
 					def coffee_create_task = findTask({it.caseId.eq(new_coffee_instance.stringId).and(it.transitionId.eq("t_create"))})
 					if(coffee_create_task == null) {
-						change test value {"Return v task"}
 						return
 					}
 
@@ -961,7 +971,6 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<id>Add_coffee_cancel</id>
 			<actions phase="post">
 				<action>
-				test: f.test,
 				coffee_create_taskref: f.coffee_create_taskref;
 
 				if(coffee_create_taskref.value == null || coffee_create_taskref.value == []) {
