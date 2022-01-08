@@ -26,7 +26,7 @@
 		<id>novy_nazov_kavy</id>
 		<title>Názov kávy</title>
 	</data>
-	<data type="enumeration">
+	<data type="multichoice_map">
 		<id>ponuka_kav</id>
 		<title></title>
 	</data>
@@ -35,12 +35,7 @@
 		<title></title>
 		<init>t38</init>
 	</data>
-	<data type="text">
-		<id>kosik</id>
-		<title></title>
-		<values>area</values>
-	</data>
-	<data type="enumeration">
+	<data type="enumeration_map">
 		<id>kosik_nahlad</id>
 		<title>Váš Kôš</title>
 		<view>
@@ -118,16 +113,6 @@
 		<id>nova_poziadavka</id>
 		<title>Pridať novú požiadavku pre pražiara</title>
 		<values>area</values>
-		<action trigger="set">
-			text_2: f.nova_poziadavka,
-			enumeration_0: f.poziadavky_id;
-
-			change enumeration_0 choices { 
-				return enumeration_0.choices + [text_2.value];
-				
-			}
-            change text_2 value {""}
-</action>
 	</data>
 	<data type="taskRef">
 		<id>taskRef_1</id>
@@ -302,6 +287,21 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="finish">
+			<id>t6_finish</id>
+			<actions phase="post">
+				<action>
+					text_2: f.nova_poziadavka,
+					enumeration_0: f.poziadavky_id;
+
+					change enumeration_0 choices { 
+						return enumeration_0.choices + [text_2.value];
+						
+					}
+					change text_2 value {""}
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>t8</id>
@@ -381,8 +381,8 @@
 					def cases = findCases( {it.processIdentifier.eq("6183c1a50a975a0f8cb2031c_kava")} );
 
 					for (caze in cases) {
-						change ponuka_kav choices { return ponuka_kav.choices + [(caze.dataSet.get("krajina_povodu").value + " - " + caze.dataSet.get("odroda").value + " " + caze.dataSet.get("vaha").value + "g, " + caze.dataSet.get("cena").value + "€")]}
-						//change ponuka_kav choices { return ponuka_kav.choices + ["kava"]}
+
+						change ponuka_kav options { return ponuka_kav.options + [(caze.stringId):(caze.dataSet.get("krajina_povodu").value + "  -  " + caze.dataSet.get("vaha").value + "g,  " + caze.dataSet.get("cena").value + "€,  " + caze.dataSet.get("odroda").value)]}
 					}
 				</action>
 			</actions>
@@ -394,9 +394,24 @@
 					ponuka_kav: f.ponuka_kav,
 					kosik: f.kosik_nahlad;
 
-					change kosik choices {
-						return kosik.choices + ponuka_kav.value;
+
+					def selected_coffee_ids = ponuka_kav.value;
+
+					for (opt in selected_coffee_ids) {
+						def curr_coffee_case = findCase( { it._id.eq(opt) } )
+
+						if(curr_coffee_case == null) {
+							continue;
+						}
+
+						change kosik options {
+							return kosik.options + [(curr_coffee_case.stringId):(curr_coffee_case.dataSet.get("krajina_povodu").value + "  -  " + curr_coffee_case.dataSet.get("vaha").value + "g,  " + curr_coffee_case.dataSet.get("cena").value + "€,  " + curr_coffee_case.dataSet.get("odroda").value)];
+						}
 					}
+
+					change ponuka_kav options {[:]}
+					change ponuka_kav value {null}
+
 				</action>
 			</actions>
 		</event>
@@ -763,10 +778,10 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 					rozpocet: f.rozpocet;
 
 					def c = 0.0
-					for(def polozka in kosik.choices){
-						polozka = polozka.toString()
-						def tmp = polozka.split(",")
-						c = c +  Double.parseDouble(tmp[1])
+					def keys = kosik.options?.keySet()
+					for(key in keys){
+						def caze = findCase( {it._id.eq(key)} );
+						c = c + caze.dataSet.get("cena").value
 					}
 
 					if (c &gt; rozpocet.value) {
@@ -898,7 +913,6 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<actions phase="post">
 				<action>
 				test: f.test,
-				ponuka_kav: f.ponuka_kav,
 				coffee_create_taskref: f.coffee_create_taskref;
 
 				if(coffee_create_taskref.value == null || coffee_create_taskref.value == []) {
@@ -922,7 +936,6 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<actions phase="post">
 				<action>
 					test: f.test,
-					ponuka_kav: f.ponuka_kav,
 					coffee_create_taskref: f.coffee_create_taskref;
 
 
@@ -931,22 +944,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 						return
 					}
 
-					def new_coffee_instance = findCase( { it._id.eq(new_created_coffee_task.caseId) } )
-
-					if (new_coffee_instance == null) {
-						return
-					}
-
-					change test value {"chzbqa nefinishnuty"}
-					
-					change ponuka_kav choices { return ponuka_kav.choices + [(new_coffee_instance.dataSet.get("krajina_povodu").value + " - " + new_coffee_instance.dataSet.get("odroda").value + " " + new_coffee_instance.dataSet.get("vaha").value + "g, " + new_coffee_instance.dataSet.get("cena").value + "€" )] }
-					//change ponuka_kav choices { return ponuka_kav.choices + ["kava"]}
-
-					change test value {"Create nefinishnuty"}
-
 					finishTask(new_created_coffee_task)
-
-					change test value {"Create finishnuty"}
 
 					change coffee_create_taskref value { [] }
 				</action>
