@@ -37,7 +37,7 @@
 	</data>
 	<data type="enumeration_map">
 		<id>kosik_nahlad</id>
-		<title>Váš Kôš</title>
+		<title>Váš košík</title>
 		<view>
 			<list/>
 		</view>
@@ -121,6 +121,10 @@
 	</data>
 	<data type="taskRef">
 		<id>coffee_create_taskref</id>
+		<title></title>
+	</data>
+	<data type="taskRef">
+		<id>poziadavka_create_taskref</id>
 		<title></title>
 	</data>
 	<data type="text">
@@ -239,7 +243,7 @@
 			<dataRef>
 				<id>poziadavky_id</id>
 				<logic>
-					<behavior>editable</behavior>
+					<behavior>visible</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
@@ -252,6 +256,20 @@
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>zobrazenie_finish</id>
+			<actions phase="pre">
+				<action>
+					poziadavky: f.poziadavky_id;
+
+					def cases = findCases( {it.processIdentifier.eq("6183c1a50a975a0f8cb2031c_poziadavka")} );
+
+					for (caze in cases) {
+						change poziadavky choices { return poziadavky.choices + [caze.dataSet.get("poziadavka").value]}
+					}
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>t27</id>
@@ -272,33 +290,82 @@
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>nova_poziadavka</id>
+				<id>poziadavka_create_taskref</id>
 				<logic>
 					<behavior>editable</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
 					<y>0</y>
-					<rows>2</rows>
-					<cols>4</cols>
+					<rows>1</rows>
+					<cols>1</cols>
 					<offset>0</offset>
 					<template>material</template>
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
 		</dataGroup>
+		<event type="assign">
+			<id>Add_poziadavka_assign</id>
+			<actions phase="post">
+				<action>
+					poziadavka_create_taskref: f.poziadavka_create_taskref;
+
+					def new_poziadavka_instance = createCase("6183c1a50a975a0f8cb2031c_poziadavka")
+
+					if (new_poziadavka_instance == null) {
+						return
+					}
+
+					def poziadavka_create_task = findTask({it.caseId.eq(new_poziadavka_instance.stringId).and(it.transitionId.eq("t_create"))})
+
+					if(poziadavka_create_task == null) {
+						return
+					}
+
+					assignTask(poziadavka_create_task)
+					
+					change poziadavka_create_taskref value { [poziadavka_create_task.stringId]; }
+
+				</action>
+			</actions>
+		</event>
+		<event type="cancel">
+			<id>Add_poziadavka_cancel</id>
+			<actions phase="post">
+				<action>
+				poziadavka_create_taskref: f.poziadavka_create_taskref;
+
+				if(poziadavka_create_taskref.value == null || poziadavka_create_taskref.value == []) {
+					return
+				}
+
+				def poziadavka_create_to_cancel = findTask({it._id.eq(poziadavka_create_taskref.value.first())})
+				if(poziadavka_create_to_cancel == null) {
+					change poziadavka_create_taskref value { [] }
+					return
+				}
+
+				cancelTask(poziadavka_create_to_cancel)
+
+				change poziadavka_create_taskref value { [] }
+				</action>
+			</actions>
+		</event>
 		<event type="finish">
 			<id>t6_finish</id>
 			<actions phase="post">
 				<action>
-					text_2: f.nova_poziadavka,
-					enumeration_0: f.poziadavky_id;
+					poziadavka_create_taskref: f.poziadavka_create_taskref;
 
-					change enumeration_0 choices { 
-						return enumeration_0.choices + [text_2.value];
-						
+					def new_created_poziadavka_task = findTask({it._id.eq(poziadavka_create_taskref.value.first())})
+					if(new_created_poziadavka_task == null) {
+						return
 					}
-					change text_2 value {""}
+
+					finishTask(new_created_poziadavka_task)
+
+					change poziadavka_create_taskref value { [] }
 				</action>
 			</actions>
 		</event>
@@ -864,27 +931,11 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 					<appearance>outline</appearance>
 				</layout>
 			</dataRef>
-			<dataRef>
-				<id>test</id>
-				<logic>
-					<behavior>editable</behavior>
-				</logic>
-				<layout>
-					<x>0</x>
-					<y>1</y>
-					<rows>1</rows>
-					<cols>1</cols>
-					<offset>0</offset>
-					<template>material</template>
-					<appearance>outline</appearance>
-				</layout>
-			</dataRef>
 		</dataGroup>
 		<event type="assign">
 			<id>Add_coffee_assign</id>
 			<actions phase="post">
 				<action>
-					test: f.test,
 					coffee_create_taskref: f.coffee_create_taskref;
 
 					def new_coffee_instance = createCase("6183c1a50a975a0f8cb2031c_kava")
@@ -902,8 +953,6 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 					assignTask(coffee_create_task)
 
 					change coffee_create_taskref value { [coffee_create_task.stringId]; }
-
-					change test value {"Som na konci"}
 
 				</action>
 			</actions>
@@ -935,9 +984,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<id>Add_coffee_finish</id>
 			<actions phase="post">
 				<action>
-					test: f.test,
 					coffee_create_taskref: f.coffee_create_taskref;
-
 
 					def new_created_coffee_task = findTask({it._id.eq(coffee_create_taskref.value.first())})
 					if(new_created_coffee_task == null) {
@@ -972,6 +1019,7 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 				<id>ponuka_kav</id>
 				<logic>
 					<behavior>editable</behavior>
+					<behavior>required</behavior>
 				</logic>
 				<layout>
 					<x>0</x>
