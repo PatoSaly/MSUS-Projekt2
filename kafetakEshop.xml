@@ -32,7 +32,7 @@
 		<init>t38</init>
 	</data>
 	<data type="enumeration_map">
-		<id>kosik_nahlad</id>
+		<id>kos1</id>
 		<title>Váš košík</title>
 		<view>
 			<list/>
@@ -123,6 +123,13 @@
 		<id>poziadavka_create_taskref</id>
 		<title></title>
 	</data>
+	<data type="enumeration_map">
+		<id>test</id>
+		<title>Košík</title>
+		<view>
+			<list/>
+		</view>
+	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
 	<transition>
@@ -150,7 +157,7 @@
 			<id>DataGroup</id>
 			<layout>grid</layout>
 			<dataRef>
-				<id>kosik_nahlad</id>
+				<id>test</id>
 				<logic>
 					<behavior>visible</behavior>
 				</logic>
@@ -249,7 +256,7 @@
 			</dataRef>
 		</dataGroup>
 		<event type="assign">
-			<id>zobrazenie_finish</id>
+			<id>zobrazenie_finish1</id>
 			<actions phase="pre">
 				<action>
 					poziadavky: f.poziadavky_id;
@@ -263,7 +270,7 @@
 			</actions>
 		</event>
 		<event type="cancel">
-			<id>zobrazenie_finish</id>
+			<id>zobrazenie_finish2</id>
 			<actions phase="post">
 				<action>
 					poziadavky: f.poziadavky_id;
@@ -273,7 +280,7 @@
 			</actions>
 		</event>
 		<event type="finish">
-			<id>zobrazenie_finish</id>
+			<id>zobrazenie_finish3</id>
 			<actions phase="post">
 				<action>
 					poziadavky: f.poziadavky_id;
@@ -365,7 +372,7 @@
 			</actions>
 		</event>
 		<event type="finish">
-			<id>t6_finish</id>
+			<id>t6_finish_WEWEEWE</id>
 			<actions phase="post">
 				<action>
 					poziadavka_create_taskref: f.poziadavka_create_taskref;
@@ -460,37 +467,38 @@
 					def cases = findCases( {it.processIdentifier.eq("6183c1a50a975a0f8cb2031c_kava")} );
 
 					for (caze in cases) {
-
 						change ponuka_kav options { return ponuka_kav.options + [(caze.stringId):(caze.dataSet.get("krajina_povodu").value + "  -  " + caze.dataSet.get("vaha").value + "g,  " + caze.dataSet.get("cena").value + "€,  " + caze.dataSet.get("odroda").value)]}
 					}
 				</action>
 			</actions>
 		</event>
 		<event type="finish">
-			<id>t6_finish</id>
+			<id>t6_finish_swewss</id>
 			<actions phase="post">
 				<action>
 					ponuka_kav: f.ponuka_kav,
-					kosik: f.kosik_nahlad;
-
+					test: f.test;
 
 					def selected_coffee_ids = ponuka_kav.value;
 
-					for (opt in selected_coffee_ids) {
+					for (def opt in selected_coffee_ids) {
 						def curr_coffee_case = findCase( { it._id.eq(opt) } )
 
 						if(curr_coffee_case == null) {
-							continue;
+							continue
 						}
 
-						change kosik options {
-							return kosik.options + [(curr_coffee_case.stringId):(curr_coffee_case.dataSet.get("krajina_povodu").value + "  -  " + curr_coffee_case.dataSet.get("vaha").value + "g,  " + curr_coffee_case.dataSet.get("cena").value + "€,  " + curr_coffee_case.dataSet.get("odroda").value)];
+						change test options {
+							return test.options + [(curr_coffee_case.stringId):(curr_coffee_case.dataSet.get("krajina_povodu").value + "  -  " + curr_coffee_case.dataSet.get("vaha").value + "g,  " + curr_coffee_case.dataSet.get("cena").value + "€,  " + curr_coffee_case.dataSet.get("odroda").value)];
 						}
+
+						//change test options {
+						//	return [(curr_coffee_case.stringId):(curr_coffee_case.dataSet.get("krajina_povodu").value + "  -  " + curr_coffee_case.dataSet.get("vaha").value + "g,  " + curr_coffee_case.dataSet.get("cena").value + "€,  " + curr_coffee_case.dataSet.get("odroda").value)];
+						//}
 					}
 
 					change ponuka_kav options {[:]}
 					change ponuka_kav value {null}
-
 				</action>
 			</actions>
 		</event>
@@ -851,13 +859,13 @@ if (sposob_platby.value == "Platba prevodom na účet") {
 			<id>t23_finish</id>
 			<actions phase="post">
 				<action>
-					kosik: f.kosik_nahlad,
+					test: f.test,
 					text_3: f.vyjadrenie_o_overeni,
 					cena: f.cena_za_kavu,
 					rozpocet: f.rozpocet;
 
 					def c = 0.0
-					def keys = kosik.options?.keySet()
+					def keys = test.options?.keySet()
 					for(key in keys){
 						def caze = findCase( {it._id.eq(key)} );
 						c = c + caze.dataSet.get("cena").value
